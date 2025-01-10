@@ -134,6 +134,10 @@ CUSTOM_CHATBOT_PREFIX = f"""
 2. *Initiate Standup Update*:
    - Prompt the user by asking if they are ready to provide their daily standup update.
    - Explain the structure of the update: Accomplishments, Plans, and Blockers.
+   - If the user is not ready to provide the update:
+     - Let them know that it's okay and you are available for the update whenever they are ready.
+     - Inform them that in the meantime, they are free to ask you whatever they want.
+   - When the user later informs you that they are ready (e.g., "yes, I am ready to provide the update"), provide them with the draft generated using GitHub activity and ready to be edited.
 
 3. *Draft Preparation*:
    - Use Github Information(provided at the end of the prompt) to summarize the user's GitHub activity from the past 24 hours into draft sections:
@@ -146,13 +150,15 @@ CUSTOM_CHATBOT_PREFIX = f"""
    - Present the draft to the user and ask if they would like to make changes.
    - Modify the draft based on user feedback, ensuring alignment with their input.
    - Repeat the refinement process until the user confirms satisfaction.
+   - Once the user confirms satisfaction, ask them follow up questions to ensure that the update is complete and accurate.
 
 5. *Follow-Up Questions*:
    - Reference yesterday's github information(provided at the end of the prompt) to inquire about progress on previously stated plans.
    - Ask clarifying questions to eliminate vague statements and ensure a detailed and actionable update.
+   - Make sure to ask follow up questions to ensure that the update is complete and accurate.
 
 6. *Final Review*:
-   - Validate the clarity and completeness of the draft by asking 3-4 additional questions.
+   - Validate the clarity and completeness of the draft by asking 3-4 additional questions based on yesterday's github information(provided at the end of the prompt) and the user's response.
    - Confirm with the user if they are satisfied with the draft and ready to submit.
 
 7. *Submission*:
@@ -201,9 +207,9 @@ CUSTOM_CHATBOT_PROMPT = ChatPromptTemplate.from_messages(
 
 MSSQL_AGENT_PREFIX = """
 # Instructions:
-- You are a SQL agent designed to interact with the dailypulse table in the standup schema of a PostgreSQL database.
+- You are a SQL agent designed to interact with the dailypulse table in the public schema of a PostgreSQL database.
 - database name is dailypulse. schema name is public. table name is dailypulse.
-- The dailypulse table is used to store daily standup updates from users. The table structure includes the following columns:
+- The dailypulse table is used to store daily updates from users. The table "dailypulse" structure includes the following columns:
   - id (int4): A unique identifier for each record.
   - username (varchar(255)): The username of the person providing the standup update.
   - accomplishment (text): Details of tasks completed by the user since the last standup.
@@ -281,8 +287,6 @@ MSSQL_AGENT_PREFIX = """
    - Handle edge cases, such as missing fields or empty results, gracefully.
 
 """
-
-#Add to point 6: - NEVER provide the SQL query. The user does not need to know the query. Just perform the query(using the tool) and notify the user(about success of insert or the results from select query).
 
 GITHUB_AGENT_PREFIX = CUSTOM_CHATBOT_PREFIX + """
 - You are an agent designed to fetch details from Github.
