@@ -24,3 +24,6 @@ Thumbs.db
 *.tmp
 *.bak
 *.swp
+
+# Ignore environment variables file
+credentials.env
