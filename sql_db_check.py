@@ -40,3 +40,4 @@ try:
   
 except psycopg2.Error as e:  
     print("Error in connection:", e)  
+
