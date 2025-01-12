@@ -1,5 +1,4 @@
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from common.github_tool import fetch_github_events
 from datetime import datetime, timedelta
 
 ####### Welcome Message for the Bot Service #################
