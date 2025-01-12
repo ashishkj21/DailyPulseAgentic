@@ -8,7 +8,7 @@ __pycache__/
 *$py.class
 
 # Ignore Jupyter Notebook checkpoints
-.ipynb_checkpoints
+.ipynb_checkpoints/
 
 # Ignore specific files and directories from your project
 # Based on the provided code snippets, you might want to ignore:
@@ -27,3 +27,9 @@ Thumbs.db
 
 # Ignore environment variables file
 credentials.env
+
+# Ignore Jupyter Notebook copies
+Backend-Copy1.ipynb
+venv/
+.ipynb_checkpoints/
+Backend-Copy1.ipynb
