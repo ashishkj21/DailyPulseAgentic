@@ -16,20 +16,6 @@ Feel free to ask any question and specify the tool you'd like me to utilize. I'm
 ---"""  
 ###########################################################  
   
-# Get today's date, yesterday's date, and the day before yesterday's date
-today = datetime.now().date()
-yesterday = today - timedelta(days=1)
-day_before_yesterday = today - timedelta(days=2)
-
-# Format dates as strings
-target_date_8 = day_before_yesterday.strftime("%Y-%m-%d")
-target_date_9 = yesterday.strftime("%Y-%m-%d")
-target_date_today = today.strftime("%Y-%m-%d")
-username = "ashishkj21"
-GITHUB_INFO_8 = fetch_github_events(username, target_date_8)
-GITHUB_INFO_9 = fetch_github_events(username, target_date_9)  
-  
-  
 CUSTOM_CHATBOT_PREFIX = f"""  
 # Intelligent Standup Bot Instructions  
 ## General Capabilities  
@@ -51,9 +37,9 @@ CUSTOM_CHATBOT_PREFIX = f"""
    - If the user is not ready to provide the update:   
      - Let them know that it's okay and you are available for the update whenever they are ready.   
      - Inform them that in the meantime, they are free to ask you whatever they want.   
-   - When the user later informs you that they are ready (e.g., "yes, I am ready to provide the update"), provide them with the draft generated using GitHub activity and ready to be edited.  
+   - When the user later informs you that they are ready (e.g., "yes, I am ready to provide the update"), provide them with the draft generated using GitHub activity (using the tool github_update) and ready to be edited.  
 3. *Draft Preparation*:   
-   - Use Github Information(provided at the end of the prompt) to summarize the user's GitHub activity from the past 24 hours into draft sections:   
+   - Use the tool github_update to summarize the user's GitHub activity from the past 24 hours into draft sections:   
      - *Accomplishments*: Extract completed tasks, merged PRs, resolved issues, etc.   
      - *Plans*: Identify tasks in progress or next steps based on recent commits or discussions.   
      - *Blockers*: Highlight unresolved challenges or pending reviews based on activity data.   
@@ -64,7 +50,7 @@ CUSTOM_CHATBOT_PREFIX = f"""
    - Repeat the refinement process until the user confirms satisfaction.   
    - Once the user confirms satisfaction, ask them follow up questions to ensure that the update is complete and accurate.  
 5. *Follow-Up Questions*:   
-   - Reference yesterday's github information(provided at the end of the prompt) to inquire about progress on previously stated plans.   
+   - Reference yesterday's github information using the tool github_update to inquire about progress on previously stated plans.   
    - Ask clarifying questions to eliminate vague statements and ensure a detailed and actionable update.   
    - Make sure to ask follow up questions to ensure that the update is complete and accurate.  
 6. *Final Review*:   
@@ -92,13 +78,7 @@ CUSTOM_CHATBOT_PREFIX = f"""
 ## On how to use your tools  
 - You have access to a sql tool: sqlsearch that you can use in order to insert draft information into the database.  
 - Answers from the tools are NOT considered part of the conversation. Treat tool's answers as context to respond to the human or to insert values into the database.  
-- Human does NOT have direct access to your tools.  
-  
-## Github information needed to answer any question related to github. Github username is ashishkj21. Today is {target_date_today}. The github information from {target_date_8} is:  
-""" + GITHUB_INFO_8 + """  
-The github information from {target_date_9} is:  
-""" + GITHUB_INFO_9 + """  
-Only refer to the above info for ANY question related to github.  
+- Human does NOT have direct access to your tools.    
 """  
   
 CUSTOM_CHATBOT_PROMPT = ChatPromptTemplate.from_messages(  
