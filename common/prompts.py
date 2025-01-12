@@ -1,5 +1,4 @@
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from datetime import datetime, timedelta
 
 ####### Welcome Message for the Bot Service #################
 WELCOME_MESSAGE = """
