@@ -14,3 +14,7 @@ pyodbc
 tabulate
 python-dotenv
 pydantic==1.10.13
+fastapi
+uvicorn
+slack_sdk
+slack_bolt
