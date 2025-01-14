@@ -1,31 +1,15 @@
 import os
 from fastapi import FastAPI, Request, HTTPException
-from slack_sdk import WebClient
-from slack_sdk.errors import SlackApiError
 from slack_bolt.adapter.fastapi import SlackRequestHandler
 from slack_bolt import App
 from dotenv import load_dotenv
 import random
-import json
-import requests
-from operator import itemgetter
-from typing import Union, List
 from langchain_openai import AzureChatOpenAI
 from langchain.agents import AgentExecutor, Tool, create_openai_tools_agent
-from langchain_community.chat_message_histories import ChatMessageHistory, CosmosDBChatMessageHistory
+from langchain_community.chat_message_histories import CosmosDBChatMessageHistory
 from langchain.callbacks.manager import CallbackManager
 from langchain_core.runnables.history import RunnableWithMessageHistory
-from langchain_core.runnables import ConfigurableFieldSpec, ConfigurableField
-from langchain_core.prompts import PromptTemplate, ChatPromptTemplate, MessagesPlaceholder
-from langchain_core.output_parsers import StrOutputParser
-from langchain.output_parsers import JsonOutputToolsParser
-from langchain_core.runnables import (
-    Runnable,
-    RunnableLambda,
-    RunnableMap,
-    RunnablePassthrough,
-)
-from langchain_community.utilities import SQLDatabase
+from langchain_core.runnables import ConfigurableFieldSpec
 
 #custom libraries that we will use later in the app
 from common.utils import (
@@ -34,7 +18,6 @@ from common.utils import (
 )
 from common.callbacks import StdOutCallbackHandler
 from common.prompts import CUSTOM_CHATBOT_PROMPT 
-from IPython.display import Markdown, HTML, display 
 
 # Load environment variables from credentials.env file
 load_dotenv("credentials.env")

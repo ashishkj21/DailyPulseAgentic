@@ -91,7 +91,7 @@ class GithubUpdateTool(BaseTool):
     def _run(self) -> str:  
         """Use the tool."""  
         print("Running GithubUpdateTool")  
-        username = os.getenv("GITHUB_USERNAME")  
+        username = os.getenv("GITHUB_USERNAME")
         if not username:  
             print("Error: GITHUB_USERNAME environment variable is not set")  
             raise ValueError("GITHUB_USERNAME environment variable is not set")  

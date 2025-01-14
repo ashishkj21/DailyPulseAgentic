@@ -1,10 +1,16 @@
 import requests
+import os
 import json
 from datetime import datetime
+import dotenv
+
+dotenv.load_dotenv("../credentials.env")
 
 # Linear API Configuration
-API_URL = "https://api.linear.app/graphql"
-API_KEY = "lin_api_8b9SoXx2FNXK0cbVhNSUIHRU4RG6rwl4k6V9RtgY"  # Replace with your Linear API Key
+API_URL = os.getenv("LINEAR_API_URL")
+API_KEY = os.getenv("LINEAR_API_KEY")
+USER_EMAIL = os.getenv("LINEAR_USER_EMAIL") 
+GITHUB_USERNAME = os.getenv("GITHUB_USERNAME")
 
 # GraphQL Query to fetch user ID dynamically
 USER_QUERY = """
@@ -70,21 +76,21 @@ def fetch_linear_user_id(email):
 
     return users[0]["id"]  # Return the first user's ID
 
-def filter_linear_issues(issues, target_date, state_name):
+def filter_linear_issues(issues, target_date):
     """
-    Filter Linear issues based on the target date and state name.
+    Filter all the Linear issues based on the target date.
     """
     filtered_issues = []
     target_date_obj = datetime.strptime(target_date, "%Y-%m-%d").date()
 
     for issue in issues:
         issue_date = datetime.fromisoformat(issue['createdAt'].replace("Z", "+00:00")).date()
-        if issue_date == target_date_obj and issue['state']['name'] == state_name:
+        if issue_date == target_date_obj:
             filtered_issues.append(issue)
 
     return filtered_issues
 
-def fetch_linear_user_activities(user_id, target_date=None, state_name=None):
+def fetch_linear_user_activities(user_id, target_date=None):
     # Set up headers
     headers = {
         "Authorization": API_KEY,
@@ -107,8 +113,8 @@ def fetch_linear_user_activities(user_id, target_date=None, state_name=None):
     data = response.json()
     issues = data.get("data", {}).get("issues", {}).get("nodes", [])
 
-    if target_date and state_name:
-        issues = filter_linear_issues(issues, target_date, state_name)
+    if target_date :
+        issues = filter_linear_issues(issues, target_date)
 
     return issues
 
@@ -183,15 +189,15 @@ def fetch_github_events(username: str, target_date: str) -> str:
     # Combine all events into a single formatted string  
     return "\n\n".join(event_details)
 
-def fetch_github_and_linear_events(email, github_username, target_date, state_name):
+def fetch_github_and_linear_events( github_username, target_date):
     # Fetch Linear user ID
-    user_id = fetch_linear_user_id(email)
+    user_id = fetch_linear_user_id(USER_EMAIL)
     if not user_id:
         print("Failed to retrieve Linear user ID.")
         return "Failed to retrieve Linear user ID."
 
     # Fetch Linear activities
-    linear_activities = fetch_linear_user_activities(user_id, target_date, state_name)
+    linear_activities = fetch_linear_user_activities(user_id, target_date)
     if not linear_activities:
         print("No Linear activities found.")
         linear_activities = []
@@ -207,16 +213,15 @@ def fetch_github_and_linear_events(email, github_username, target_date, state_na
 
     return combined_events
 
-if __name__ == "__main__":
-    # Replace with your Linear email
-    USER_EMAIL = "jha.ashish.kj@gmail.com"  # Replace with your email
-    GITHUB_USERNAME = "ashishkj21"  # Replace with the GitHub username
-    TARGET_DATE = "2025-01-13"  # Replace with the target date
-    STATE_NAME = "In Progress"  # Replace with the state name
+def main():
+    TARGET_DATE = "2025-01-13"    
 
     # Fetch combined events
-    combined_events = fetch_github_and_linear_events(USER_EMAIL, GITHUB_USERNAME, TARGET_DATE, STATE_NAME)
+    combined_events = fetch_github_and_linear_events(GITHUB_USERNAME, TARGET_DATE)
     if combined_events:
         print(combined_events)
     else:
         print("Failed to fetch events.")
+
+if __name__ == "__main__":
+    main()
