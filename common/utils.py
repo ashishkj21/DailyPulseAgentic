@@ -7,7 +7,7 @@ from langchain.sql_database import SQLDatabase
 from langchain_community.agent_toolkits import SQLDatabaseToolkit, create_sql_agent  
 from langchain_openai import AzureChatOpenAI  
 from langchain.callbacks.manager import CallbackManagerForToolRun, AsyncCallbackManagerForToolRun   
-from common.fetch_info import fetch_github_events
+from common.fetch_info import fetch_github_and_linear_events
   
 try:  
     from .prompts import MSSQL_AGENT_PREFIX  
@@ -84,22 +84,22 @@ class SQLSearchAgent(BaseTool):
             print(e)  
             return str(e)  # Return an error indicator  
   
-class GithubUpdateTool(BaseTool):  
-    name = "github_update"  
-    description = "Fetches GitHub updates for the given username from the environment variable for yesterday's date"  
+class Github_Linear_UpdateTool(BaseTool):  
+    name = "github_linear_update"  
+    description = "Fetches GitHub and Linear updates for the given username from the environment variable for yesterday's date"  
   
     def _run(self) -> str:  
         """Use the tool."""  
-        print("Running GithubUpdateTool")  
+        print("Running Github_Linear_UpdateTool")  
         username = os.getenv("GITHUB_USERNAME")
         if not username:  
             print("Error: GITHUB_USERNAME environment variable is not set")  
             raise ValueError("GITHUB_USERNAME environment variable is not set")  
   
         # yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")  
-        yesterday = "2025-01-10"
-        print(f"Fetching GitHub events for user: {username} on date: {yesterday}")  
-        events = fetch_github_events(username, yesterday)  
+        yesterday = "2025-01-13"
+        print(f"Fetching GitHub and Linear events for user: {username} on date: {yesterday}")  
+        events = fetch_github_and_linear_events(username, yesterday)  
         print(f"Fetched events: {events}")  
         return events  
   

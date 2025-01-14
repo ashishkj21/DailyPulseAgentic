@@ -7,10 +7,14 @@ import dotenv
 dotenv.load_dotenv("../credentials.env")
 
 # Linear API Configuration
-API_URL = os.getenv("LINEAR_API_URL")
-API_KEY = os.getenv("LINEAR_API_KEY")
-USER_EMAIL = os.getenv("LINEAR_USER_EMAIL") 
-GITHUB_USERNAME = os.getenv("GITHUB_USERNAME")
+# API_URL = os.getenv("LINEAR_API_URL")
+# API_KEY = os.getenv("LINEAR_API_KEY")
+# USER_EMAIL = os.getenv("LINEAR_USER_EMAIL") 
+# GITHUB_USERNAME = os.getenv("GITHUB_USERNAME")
+API_URL="https://api.linear.app/graphql"
+API_KEY="lin_api_8b9SoXx2FNXK0cbVhNSUIHRU4RG6rwl4k6V9RtgY"
+USER_EMAIL="jha.ashish.kj@gmail.com"
+GITHUB_USERNAME="ashishkj21"
 
 # GraphQL Query to fetch user ID dynamically
 USER_QUERY = """
