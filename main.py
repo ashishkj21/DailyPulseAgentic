@@ -1,40 +1,23 @@
 import os
 from fastapi import FastAPI, Request, HTTPException
-from slack_sdk import WebClient
-from slack_sdk.errors import SlackApiError
 from slack_bolt.adapter.fastapi import SlackRequestHandler
 from slack_bolt import App
 from dotenv import load_dotenv
 import random
-import json
-import requests
-from operator import itemgetter
-from typing import Union, List
 from langchain_openai import AzureChatOpenAI
 from langchain.agents import AgentExecutor, Tool, create_openai_tools_agent
-from langchain_community.chat_message_histories import ChatMessageHistory, CosmosDBChatMessageHistory
+from langchain_community.chat_message_histories import CosmosDBChatMessageHistory
 from langchain.callbacks.manager import CallbackManager
 from langchain_core.runnables.history import RunnableWithMessageHistory
-from langchain_core.runnables import ConfigurableFieldSpec, ConfigurableField
-from langchain_core.prompts import PromptTemplate, ChatPromptTemplate, MessagesPlaceholder
-from langchain_core.output_parsers import StrOutputParser
-from langchain.output_parsers import JsonOutputToolsParser
-from langchain_core.runnables import (
-    Runnable,
-    RunnableLambda,
-    RunnableMap,
-    RunnablePassthrough,
-)
-from langchain_community.utilities import SQLDatabase
+from langchain_core.runnables import ConfigurableFieldSpec
 
 #custom libraries that we will use later in the app
 from common.utils import (
     SQLSearchAgent, 
-    GithubUpdateTool
+    Github_Linear_UpdateTool
 )
 from common.callbacks import StdOutCallbackHandler
 from common.prompts import CUSTOM_CHATBOT_PROMPT 
-from IPython.display import Markdown, HTML, display 
 
 # Load environment variables from credentials.env file
 load_dotenv("credentials.env")
@@ -59,13 +42,13 @@ sql_search = SQLSearchAgent(llm=llm, k=10, callback_manager=cb_manager,
                 description="useful when the questions includes the term: sqlsearch",
                 verbose=False)
 
-github_update_tool = GithubUpdateTool(
-    name="github_update",
-    description="Fetches GitHub updates for the given username from the environment variable for yesterday's date",
+github_linear_update_tool = Github_Linear_UpdateTool(
+    name="github_linear_update",
+    description="Fetches GitHub and Linear updates for the given username from the environment variable for yesterday's date",
     verbose=False
 )
 
-tools = [sql_search, github_update_tool]
+tools = [sql_search, github_linear_update_tool]
 agent = create_openai_tools_agent(llm, tools, CUSTOM_CHATBOT_PROMPT)
 agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=False)
 # Initialize the FastAPI app
