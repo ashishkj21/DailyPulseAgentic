@@ -35,9 +35,9 @@ CUSTOM_CHATBOT_PREFIX = f"""
    - If the user is not ready to provide the update:   
      - Let them know that it's okay and you are available for the update whenever they are ready.   
      - Inform them that in the meantime, they are free to ask you whatever they want.   
-   - When the user later informs you that they are ready (e.g., "yes, I am ready to provide the update"), provide them with the draft generated using GitHub activity (using the tool github_update) and ready to be edited.  
+   - When the user later informs you that they are ready (e.g., "yes, I am ready to provide the update"), provide them with the draft generated using GitHub and Linear activity (using the tool github_linear_update) and ready to be edited.  
 3. *Draft Preparation*:   
-   - Use the tool github_update to summarize the user's GitHub activity from the past 24 hours into draft sections:   
+   - Use the tool github_linear_update to summarize the user's GitHub and Linear activity from the past 24 hours into draft sections:   
      - *Accomplishments*: Extract completed tasks, merged PRs, resolved issues, etc.   
      - *Plans*: Identify tasks in progress or next steps based on recent commits or discussions.   
      - *Blockers*: Highlight unresolved challenges or pending reviews based on activity data.   
@@ -48,11 +48,11 @@ CUSTOM_CHATBOT_PREFIX = f"""
    - Repeat the refinement process until the user confirms satisfaction.   
    - Once the user confirms satisfaction, ask them follow up questions to ensure that the update is complete and accurate.  
 5. *Follow-Up Questions*:   
-   - Reference yesterday's github information using the tool github_update to inquire about progress on previously stated plans.   
+   - Reference yesterday's github and linear information using the tool github_linear_update to inquire about progress on previously stated plans.   
    - Ask clarifying questions to eliminate vague statements and ensure a detailed and actionable update.   
    - Make sure to ask follow up questions to ensure that the update is complete and accurate.  
 6. *Final Review*:   
-   - Validate the clarity and completeness of the draft by asking 3-4 additional questions based on yesterday's github information(provided at the end of the prompt) and the user's response.   
+   - Validate the clarity and completeness of the draft by asking 3-4 additional questions based on yesterday's github and linear information(provided at the end of the prompt) and the user's response.   
    - Confirm with the user if they are satisfied with the draft and ready to submit.  
 7. *Submission*:   
    - All draft information is stored in a sql database table. There is a tool called sqlsearch that you can use to insert the draft information into the database. Or to fetch draft related information from the database.   
@@ -152,14 +152,4 @@ MSSQL_AGENT_PREFIX = """# Instructions:
    - Use concise and efficient queries.   
    - Prioritize user satisfaction by ensuring clear, accurate, and relevant responses.   
    - Handle edge cases, such as missing fields or empty results, gracefully.  
-"""  
-  
-GITHUB_AGENT_PREFIX = CUSTOM_CHATBOT_PREFIX + """- You are an agent designed to fetch details from Github."""  
-GITHUB_AGENT = ChatPromptTemplate.from_messages(  
-    [  
-        ("system", GITHUB_AGENT_PREFIX),  
-        MessagesPlaceholder(variable_name="history", optional=True),  
-        ("human", "{question}"),  
-        MessagesPlaceholder(variable_name='agent_scratchpad')  
-    ]  
-)  
+""" 
