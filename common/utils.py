@@ -6,9 +6,8 @@ from langchain.tools import BaseTool
 from langchain.sql_database import SQLDatabase  
 from langchain_community.agent_toolkits import SQLDatabaseToolkit, create_sql_agent  
 from langchain_openai import AzureChatOpenAI  
-from langchain.callbacks.manager import CallbackManagerForToolRun, AsyncCallbackManagerForToolRun  
-import requests  
-from datetime import datetime, timedelta  
+from langchain.callbacks.manager import CallbackManagerForToolRun, AsyncCallbackManagerForToolRun   
+from common.fetch_info import fetch_github_and_linear_events
   
 try:  
     from .prompts import MSSQL_AGENT_PREFIX  
@@ -85,92 +84,33 @@ class SQLSearchAgent(BaseTool):
             print(e)  
             return str(e)  # Return an error indicator  
   
-class GithubUpdateTool(BaseTool):  
-    name = "github_update"  
-    description = "Fetches GitHub updates for the given username from the environment variable for yesterday's date"  
+class Github_Linear_UpdateTool(BaseTool):  
+    name = "github_linear_update"  
+    description = "Fetches GitHub and Linear updates for the given username from the environment variable for yesterday's date"  
   
     def _run(self) -> str:  
         """Use the tool."""  
-        print("Running GithubUpdateTool")  
-        username = os.getenv("GITHUB_USERNAME")  
+        print("Running Github_Linear_UpdateTool")  
+        username = os.getenv("GITHUB_USERNAME")
+        user_email = os.getenv("LINEAR_USER_EMAIL")
+        api_key = os.getenv("LINEAR_API_KEY")
+        api_url = os.getenv("LINEAR_API_URL")
+        
         if not username:  
             print("Error: GITHUB_USERNAME environment variable is not set")  
             raise ValueError("GITHUB_USERNAME environment variable is not set")  
+        if not user_email:
+            print("Error: USER_EMAIL environment variable is not set")
+            raise ValueError("USER_EMAIL environment variable is not set")
+        if not api_key:
+            print("Error: API_KEY environment variable is not set")
+            raise ValueError("API_KEY environment variable is not set")
   
         # yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")  
-        yesterday = "2025-01-10"
-        print(f"Fetching GitHub events for user: {username} on date: {yesterday}")  
-        events = fetch_github_events(username, yesterday)  
+        yesterday = "2025-01-13"
+        print(f"Fetching GitHub and Linear events for user: {username} on date: {yesterday}")  
+        events = fetch_github_and_linear_events(user_email, username, api_key, api_url, yesterday)  
         print(f"Fetched events: {events}")  
         return events  
   
-def fetch_github_events(username: str, target_date: str) -> str:  
-    """  
-    Fetch GitHub events for the user on the given date and return them as a human-readable string.  
-    """    
-    url = f"https://api.github.com/users/{username}/events/public"  
-    response = requests.get(url)  
-    if response.status_code != 200:  
-        print(f"Error: Received status code {response.status_code}")  
-        raise ValueError(f"Error: Received status code {response.status_code}")  
   
-    events = response.json() 
-    filtered_events = [  
-        event for event in events  
-        if datetime.fromisoformat(event['created_at'].replace("Z", "+00:00")).date() == datetime.strptime(target_date, "%Y-%m-%d").date()  
-    ]  
-  
-    # Process events and extract details  
-    event_details = []  
-    for event in filtered_events:  
-        event_type = event['type']  
-        repo_name = event['repo']['name']  
-        event_date = datetime.fromisoformat(event['created_at'].replace("Z", "+00:00")).strftime('%Y-%m-%d %H:%M:%S')  
-  
-        details = f"Event Type: {event_type}\nRepository: {repo_name}\nDate: {event_date}"  
-        # Event-specific details  
-        if event_type == "PullRequestEvent":  
-            pr_details = event['payload']['pull_request']  
-            details += f"""  
-                Action: {event['payload']['action']}  
-                Pull Request URL: {pr_details['html_url']}  
-                Title: {pr_details['title']}  
-                Body: {pr_details['body']}  
-            """  
-        elif event_type == "PushEvent":  
-            commits = event['payload']['commits']  
-            commit_details = "\n".join(  
-                f"  - Message: {commit['message']}\n    URL: {commit['url']}"  
-                for commit in commits  
-            )  
-            details += f"\nCommits:\n{commit_details}"  
-        elif event_type == "DeleteEvent":  
-            details += f"""  
-                Ref Type: {event['payload']['ref_type']}  
-                Ref: {event['payload']['ref']}  
-            """  
-        elif event_type == "IssueCommentEvent":  
-            comment_details = event['payload']['comment']  
-            details += f"""  
-                Action: {event['payload']['action']}  
-                Issue URL: {event['payload']['issue']['html_url']}  
-                Comment: {comment_details['body']}  
-            """  
-        elif event_type == "IssuesEvent":  
-            issue_details = event['payload']['issue']  
-            details += f"""  
-                Action: {event['payload']['action']}  
-                Issue URL: {issue_details['html_url']}  
-                Title: {issue_details['title']}  
-                Body: {issue_details['body']}  
-            """  
-        elif event_type == "CreateEvent":  
-            details += f"""  
-                Ref Type: {event['payload']['ref_type']}  
-                Ref: {event['payload'].get('ref', "N/A")}  
-            """  
-  
-        event_details.append(details)  
-  
-    # Combine all events into a single formatted string  
-    return "\n\n".join(event_details)  
